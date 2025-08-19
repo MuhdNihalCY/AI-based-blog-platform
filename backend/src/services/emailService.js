@@ -9,7 +9,14 @@ class EmailService {
 
   initializeTransporter() {
     try {
-      this.transporter = nodemailer.createTransporter({
+      // Check if SMTP credentials are provided
+      if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        logger.warn('SMTP credentials not provided. Email service will be disabled.');
+        this.transporter = null;
+        return;
+      }
+
+      this.transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
         secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
@@ -22,14 +29,16 @@ class EmailService {
         }
       });
 
-      // Verify connection configuration
-      this.transporter.verify((error, success) => {
-        if (error) {
-          logger.error('SMTP connection error:', error);
-        } else {
-          logger.info('SMTP server is ready to send emails');
-        }
-      });
+      // Verify connection configuration (only if transporter exists)
+      if (this.transporter) {
+        this.transporter.verify((error, success) => {
+          if (error) {
+            logger.error('SMTP connection error:', error);
+          } else {
+            logger.info('SMTP server is ready to send emails');
+          }
+        });
+      }
 
     } catch (error) {
       logger.error('Failed to initialize email transporter:', error);
@@ -38,7 +47,8 @@ class EmailService {
 
   async sendEmail(to, subject, html, text = null) {
     if (!this.transporter) {
-      throw new Error('Email service not initialized');
+      logger.warn('Email service not configured. Skipping email send.');
+      return { messageId: 'email-service-disabled' };
     }
 
     try {

@@ -41,5 +41,9 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.85.5",
+    "nodemon": "^3.1.10"
   }
 }

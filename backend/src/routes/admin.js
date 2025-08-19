@@ -271,4 +271,63 @@ router.get('/logs', auth, authorize('admin', 'super_admin'), async (req, res) =>
   }
 });
 
+// @route   GET /api/admin/posts
+// @desc    Get all posts for admin
+// @access  Private (Admin only)
+router.get('/posts', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .populate('author', 'username profile.firstName profile.lastName')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    logger.error('Posts retrieval error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /api/admin/media
+// @desc    Get all media files for admin
+// @access  Private (Admin only)
+router.get('/media', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    // Placeholder for media files - would integrate with actual file storage
+    const mediaFiles = [
+      {
+        _id: '1',
+        filename: 'sample-image.jpg',
+        originalName: 'Sample Image',
+        url: '/uploads/sample-image.jpg',
+        mimetype: 'image/jpeg',
+        size: 1024000,
+        uploadedBy: { username: 'admin' },
+        uploadedAt: new Date().toISOString(),
+        metadata: {
+          width: 1920,
+          height: 1080,
+          aiPrompt: 'A beautiful landscape'
+        }
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: mediaFiles
+    });
+  } catch (error) {
+    logger.error('Media retrieval error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;
