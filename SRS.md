@@ -16,6 +16,7 @@ The project will deliver a complete, full-stack application with the following c
 * A sophisticated, scheduled content generation and publishing engine powered by the Gemini Pro API for text and a free, third-party AI for images.
 * A persistent database (MongoDB) for storing all content, system configurations, and performance metrics.
 * Integration with free tools for monetization and SEO optimization.
+* A master admin account system with secure authentication and password reset functionality via email OTP.
 
 #### 1.3 Intended Audience
 This document is for the development team (frontend and backend), QA specialists, project managers, and business stakeholders. It ensures a shared, unambiguous understanding of the system's objectives and technical specifications.
@@ -26,7 +27,8 @@ This document is for the development team (frontend and backend), QA specialists
 This system is a **standalone, self-monetizing blogging platform**. It removes the need for external services like WordPress, providing complete control over the entire content pipeline. The design prioritizes automation and efficiency to minimize administrative effort and maximize passive income potential.
 
 #### 2.2 User Classes and Characteristics
-* **Administrator:** The single user who will set up, configure, and monitor the platform. The Admin requires no coding knowledge for day-to-day use but must be able to understand and configure system-level settings. Their primary interaction is with the secure admin dashboard.
+* **Master Administrator:** The primary user who will set up, configure, and monitor the platform. The Master Admin has super_admin privileges and is created automatically during system setup. Default credentials: Username: `admin`, Email: `admin@aiblogplatform.com`, Password: `Admin@2024!`. The Master Admin requires no coding knowledge for day-to-day use but must be able to understand and configure system-level settings. Their primary interaction is with the secure admin dashboard.
+* **Administrator:** Additional admin users who can be created by the Master Administrator. They have admin privileges but cannot perform system-level operations like creating other admin accounts.
 * **Reader:** The public audience. They will experience a fast, responsive, and visually appealing blog designed for optimal readability and user engagement. Their interactions are limited to consuming content and engaging with on-page elements.
 
 #### 2.3 Operating Environment
@@ -41,12 +43,25 @@ This system is a **standalone, self-monetizing blogging platform**. It removes t
 * **Free-First Approach:** The system must be designed to operate primarily on free or low-cost tools and API tiers to minimize overhead and maximize profit. This includes the image generation and future monetization integrations.
 * **Passive Income Focus:** All features must contribute to a hands-off, passive income model.
 * **Security:** The admin dashboard must be password-protected and secure. All API keys and sensitive information must be stored securely (e.g., using environment variables).
+* **Authentication:** The system must implement secure JWT-based authentication with password reset functionality via email OTP. Master admin credentials must be changeable after first login.
+* **Email Integration:** SMTP email service must be configured for password reset notifications and system alerts.
 
 ### 3. System Features and Requirements
 
 #### 3.1 Functional Requirements (Admin Dashboard)
 
-##### FR-1: Automated Content Engine
+##### FR-1: Master Admin Authentication & Security
+* **Description:** The system shall provide secure authentication for the master administrator with comprehensive security features.
+* **Features:**
+    * **Master Admin Account:** A pre-configured master admin account with super_admin privileges created during system setup.
+    * **Default Credentials:** Username: `admin`, Email: `admin@aiblogplatform.com`, Password: `Admin@2024!`.
+    * **Password Reset via Email OTP:** Secure password reset functionality using 6-digit OTP sent via email.
+    * **Account Lockout Protection:** Automatic account locking after 5 failed login attempts for 2 hours.
+    * **Password Requirements:** Minimum 8 characters with uppercase, lowercase, number, and special character requirements.
+    * **JWT Token Authentication:** Secure token-based authentication with configurable expiration.
+    * **Login Attempt Tracking:** Comprehensive logging of login attempts and security events.
+
+##### FR-2: Automated Content Engine
 * **Description:** The core of the platform. The Admin shall have granular control over the automated content generation process.
 * **Features:**
     * **Scheduled Automation:** A cron-job-like interface to set specific times or intervals for content generation (e.g., "every 12 hours," "every Monday at 8 AM").
@@ -84,12 +99,15 @@ This system is a **standalone, self-monetizing blogging platform**. It removes t
 * **Description:** The Admin shall have a clear overview of the system's performance and logs.
 * **Features:**
     * **Real-time Activity Log:** A continuously updating log that displays every action with a timestamp, including successful and failed API calls, post publications, and errors. The log should be filterable by type (e.g., "success," "error," "info").
+    * **Security Monitoring:** Comprehensive security event logging including login attempts, password resets, account lockouts, and suspicious activities.
+    * **Email Notification System:** Automated email notifications for security events, system alerts, and user activities.
     * **Usage Dashboard:** A graphical dashboard showing key metrics:
         * Total posts published.
         * Success rate of automated runs.
         * Gemini API token usage and estimated cost.
         * Image generation API usage and credit count.
         * Estimated affiliate revenue (requires manual input or a dedicated integration).
+        * Security events and login statistics.
 
 #### 3.2 Functional Requirements (Public Blog)
 
