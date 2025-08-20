@@ -391,6 +391,13 @@ class ImageService {
     const random = Math.random().toString(36).substring(2, 8);
     return `${prefix}_${timestamp}_${random}.png`;
   }
+
+  /**
+   * Check if image service is enabled and available
+   */
+  isEnabled() {
+    return this.stockImagesEnabled || this.aiGenerationEnabled;
+  }
 }
 
 module.exports = new ImageService();

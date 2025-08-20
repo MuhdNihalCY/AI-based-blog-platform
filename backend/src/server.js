@@ -10,6 +10,7 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
+const contentScheduler = require('./services/contentScheduler');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -100,6 +101,11 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Start content scheduler after server is running
+  setTimeout(() => {
+    contentScheduler.start();
+  }, 5000); // Wait 5 seconds for everything to initialize
 });
 
 // Graceful shutdown

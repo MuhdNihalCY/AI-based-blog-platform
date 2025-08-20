@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { api } from '@/lib/api';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import GenerationProgress from '@/components/admin/GenerationProgress';
 
 interface GenerationJob {
   id: string;
@@ -37,6 +38,7 @@ interface GenerationFormData {
 const defaultCategories = ['AI', 'Technology', 'Automation', 'Programming', 'Marketing', 'Business'];
 
 export default function ContentGeneration() {
+  const [activeTab, setActiveTab] = useState<'manual' | 'auto'>('manual');
   const [formData, setFormData] = useState<GenerationFormData>({
     count: 3,
     topics: [''],
@@ -51,7 +53,7 @@ export default function ContentGeneration() {
   // Check AI service status
   const { data: serviceStatus } = useQuery({
     queryKey: ['ai-service-status'],
-    queryFn: () => api.get('/automation/status').then(res => res.data.data),
+    queryFn: () => api.get('/admin/generation-status').then(res => res.data),
     refetchInterval: 30000, // Check every 30 seconds
   });
 
@@ -172,7 +174,33 @@ export default function ContentGeneration() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">AI Content Generation</h1>
-        <p className="text-gray-600">Generate high-quality blog posts using artificial intelligence</p>
+        <p className="text-gray-600">Generate high-quality blog posts manually or manage automatic generation</p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('manual')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'manual'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Manual Generation
+          </button>
+          <button
+            onClick={() => setActiveTab('auto')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'auto'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Automatic Generation
+          </button>
+        </nav>
       </div>
 
       {/* Service Status */}
@@ -211,10 +239,11 @@ export default function ContentGeneration() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Generation Form */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">Content Generation Settings</h3>
+      {activeTab === 'manual' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Generation Form */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-6">Content Generation Settings</h3>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Number of Posts */}
@@ -225,7 +254,7 @@ export default function ContentGeneration() {
               <select
                 value={formData.count}
                 onChange={(e) => setFormData(prev => ({ ...prev, count: parseInt(e.target.value) }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                   <option key={num} value={num}>{num} post{num > 1 ? 's' : ''}</option>
@@ -248,7 +277,7 @@ export default function ContentGeneration() {
                     value={topic}
                     onChange={(e) => updateTopic(index, e.target.value)}
                     placeholder={`Topic ${index + 1} (e.g., "AI-powered content creation strategies")`}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="flex-1 text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                   {formData.topics.length > 1 && (
                     <button
@@ -436,7 +465,10 @@ export default function ContentGeneration() {
             </>
           )}
         </div>
-      </div>
+        </div>
+      ) : (
+        <GenerationProgress />
+      )}
     </div>
   );
 }

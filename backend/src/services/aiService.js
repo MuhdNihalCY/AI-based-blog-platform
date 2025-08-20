@@ -17,7 +17,7 @@ class AIService {
       }
 
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+      this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       
       logger.info('AI service initialized successfully');
     } catch (error) {
@@ -379,6 +379,13 @@ class AIService {
       estimatedCost: 0,
       lastUsed: null
     };
+  }
+
+  /**
+   * Check if AI service is enabled and available
+   */
+  isEnabled() {
+    return this.model !== null && this.genAI !== null;
   }
 }
 
