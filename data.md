@@ -24,3 +24,17 @@ You'll be redirected to: http://localhost:3000/admin (dashboard)
 🔐 Admin Login: http://localhost:3000/admin/login ✅ Fixed!
 📊 Admin Dashboard: http://localhost:3000/admin (after login)
 📝 Public Blog: http://localhost:3000/blog
+
+
+
+
+https://unsplash.com/oauth/
+
+🔑 Keys
+Application ID
+794495
+Access Key
+z_P1RLReWiBaj9VtsQRCdd_eD86LzfD3IWRXSxIWI6E
+Secret key
+cza6KTWM2r3z3ySTh0QWMNsMWEOhRdUw-EJ1aG6dytw
+Note: both your Access Key and Secret Key must remain confidential.

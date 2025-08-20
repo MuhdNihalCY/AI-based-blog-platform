@@ -26,7 +26,22 @@ const postSchema = new mongoose.Schema({
     url: String,
     alt: String,
     caption: String,
-    aiPrompt: String // Store the AI prompt used to generate the image
+    source: {
+      type: String,
+      enum: ['ai_generated', 'unsplash', 'upload', 'external'],
+      default: 'upload'
+    },
+    // AI-generated image fields
+    aiPrompt: String, // Store the AI prompt used to generate the image
+    // Stock image fields (Unsplash)
+    photographer: String,
+    photographerUrl: String,
+    attribution: String,
+    unsplashId: String,
+    // Upload fields
+    filename: String,
+    size: Number,
+    mimeType: String
   },
   status: {
     type: String,
@@ -77,6 +92,12 @@ const postSchema = new mongoose.Schema({
     aiPrompt: String, // Store the AI prompt used to generate content
     generationTime: Number, // Time taken to generate in milliseconds
     apiTokensUsed: Number, // Number of tokens used from Gemini API
+    imageSource: {
+      type: String,
+      enum: ['stock', 'ai_generated', 'manual', 'none'],
+      default: 'none'
+    },
+    imageQuery: String, // Query used for stock image search
     imageGenerationTime: Number,
     imageApiCreditsUsed: Number
   },

@@ -55,7 +55,7 @@ router.post('/generate', [
     if (generateImage) {
       try {
         const imagePrompt = await aiService.generateImagePrompt(contentResult.content, imageStyle);
-        imageResult = await imageService.generateBlogImage(contentResult.content, {
+        imageResult = await imageService.getBlogImage(contentResult.content, {
           style: imageStyle,
           aspectRatio: '16:9'
         });
@@ -83,16 +83,35 @@ router.post('/generate', [
 
     // Add image data if generated
     if (imageResult && imageResult.success) {
-      const filename = imageService.generateFilename('blog');
-      const saveResult = await imageService.saveImage(imageResult.imageData, filename);
-      
-      postData.featuredImage = {
-        url: `/uploads/${filename}`,
-        alt: `Generated image for ${topic}`,
-        aiPrompt: imageResult.metadata.prompt
-      };
-      
-      postData.automation.imageGenerationTime = imageResult.metadata.generationTime;
+      if (imageResult.type === 'stock') {
+        // Stock image from Unsplash
+        postData.featuredImage = {
+          url: imageResult.image.urls.regular,
+          alt: imageResult.image.description || `Stock image for ${topic}`,
+          source: 'unsplash',
+          photographer: imageResult.image.photographer.name,
+          photographerUrl: imageResult.image.photographer.profileUrl,
+          attribution: imageResult.attribution,
+          unsplashId: imageResult.image.id
+        };
+        
+        postData.automation.imageSource = 'stock';
+        postData.automation.imageQuery = imageResult.metadata.query;
+      } else if (imageResult.type === 'ai_generated') {
+        // AI-generated image
+        const filename = imageService.generateFilename('blog');
+        const saveResult = await imageService.saveImage(imageResult.imageData, filename);
+        
+        postData.featuredImage = {
+          url: `/uploads/${filename}`,
+          alt: `AI-generated image for ${topic}`,
+          source: 'ai_generated',
+          aiPrompt: imageResult.metadata.prompt
+        };
+        
+        postData.automation.imageSource = 'ai_generated';
+        postData.automation.imageGenerationTime = imageResult.metadata.generationTime;
+      }
     }
 
     // Save post to database
@@ -193,24 +212,42 @@ router.post('/generate-image', [
 
     const { content, style = 'photography', aspectRatio = '16:9' } = req.body;
 
-    const imageResult = await imageService.generateBlogImage(content, {
+    const imageResult = await imageService.getBlogImage(content, {
       style,
       aspectRatio
     });
 
     if (imageResult.success) {
-      const filename = imageService.generateFilename('blog');
-      const saveResult = await imageService.saveImage(imageResult.imageData, filename);
-
-      res.json({
-        success: true,
-        message: 'Image generated successfully',
-        data: {
-          imageUrl: `/uploads/${filename}`,
-          filename,
-          metadata: imageResult.metadata
-        }
-      });
+      if (imageResult.type === 'stock') {
+        // Stock image from Unsplash
+        res.json({
+          success: true,
+          message: 'Stock image found successfully',
+          data: {
+            imageUrl: imageResult.image.urls.regular,
+            source: 'unsplash',
+            photographer: imageResult.image.photographer.name,
+            photographerUrl: imageResult.image.photographer.profileUrl,
+            attribution: imageResult.attribution,
+            metadata: imageResult.metadata
+          }
+        });
+      } else if (imageResult.type === 'ai_generated') {
+        // AI-generated image
+        const filename = imageService.generateFilename('blog');
+        const saveResult = await imageService.saveImage(imageResult.imageData, filename);
+        
+        res.json({
+          success: true,
+          message: 'AI image generated successfully',
+          data: {
+            imageUrl: `/uploads/${filename}`,
+            filename,
+            source: 'ai_generated',
+            metadata: imageResult.metadata
+          }
+        });
+      }
     } else {
       throw new Error('Image generation failed');
     }

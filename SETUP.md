@@ -100,15 +100,29 @@ This will start both backend (port 5000) and frontend (port 3000).
 
 ## 🔧 Configuration Options
 
-### AI Integration (Optional)
+### AI & Image Services Integration
 
-#### Gemini Pro API
+#### Gemini Pro API (Required for Content Generation)
 1. Get API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Add to `GEMINI_API_KEY` in `.env`
 
-#### Stable Diffusion API
+#### Unsplash API (Recommended - Primary Image Source)
+1. Create a free account at [Unsplash Developers](https://unsplash.com/developers)
+2. Create a new application
+3. Get your Access Key from the application dashboard
+4. Add to `UNSPLASH_ACCESS_KEY` in `.env`
+5. **Free Tier**: 50 requests/hour, 5,000 requests/month
+
+#### Stable Diffusion API (Optional - Fallback Image Generation)
 1. Get API key from [Stability AI](https://platform.stability.ai/)
 2. Add to `STABLE_DIFFUSION_API_KEY` in `.env`
+3. **Note**: Only used when stock images are unavailable
+
+#### Image Service Priority
+The system uses a smart fallback system:
+1. **Primary**: Stock images from Unsplash (fast, high-quality, free)
+2. **Fallback**: AI-generated images from Stable Diffusion (when stock images fail)
+3. **Configuration**: Set `PREFER_STOCK_IMAGES=true` to prioritize stock images
 
 ### Email Configuration (Optional)
 
