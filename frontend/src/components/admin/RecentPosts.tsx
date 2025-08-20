@@ -11,6 +11,9 @@ interface Post {
   analytics: {
     views: number;
   };
+  author?: {
+    username: string;
+  };
 }
 
 interface RecentPostsProps {
@@ -80,6 +83,11 @@ export default function RecentPosts({ posts }: RecentPostsProps) {
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
                           {status.label}
                         </span>
+                        {post.author && (
+                          <span className="text-xs text-gray-400">
+                            by {post.author.username}
+                          </span>
+                        )}
                         <span className="text-sm text-gray-500">
                           {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
                         </span>

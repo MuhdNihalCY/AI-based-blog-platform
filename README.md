@@ -129,7 +129,7 @@ npm run setup-admin
 
 This will create the master admin account with the following credentials:
 - **Username**: `admin`
-- **Email**: `admin@aiblogplatform.com`
+- **Email**: `nihalcy1234@gmail.com`
 - **Password**: `Admin@2024!`
 
 ⚠️ **Important**: Change the default password immediately after first login!

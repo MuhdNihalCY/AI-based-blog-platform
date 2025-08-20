@@ -27,7 +27,7 @@ This document is for the development team (frontend and backend), QA specialists
 This system is a **standalone, self-monetizing blogging platform**. It removes the need for external services like WordPress, providing complete control over the entire content pipeline. The design prioritizes automation and efficiency to minimize administrative effort and maximize passive income potential.
 
 #### 2.2 User Classes and Characteristics
-* **Master Administrator:** The primary user who will set up, configure, and monitor the platform. The Master Admin has super_admin privileges and is created automatically during system setup. Default credentials: Username: `admin`, Email: `admin@aiblogplatform.com`, Password: `Admin@2024!`. The Master Admin requires no coding knowledge for day-to-day use but must be able to understand and configure system-level settings. Their primary interaction is with the secure admin dashboard.
+* **Master Administrator:** The primary user who will set up, configure, and monitor the platform. The Master Admin has super_admin privileges and is created automatically during system setup. Default credentials: Username: `admin`, Email: `nihalcy1234@gmail.com`, Password: `Admin@2024!`. The Master Admin requires no coding knowledge for day-to-day use but must be able to understand and configure system-level settings. Their primary interaction is with the secure admin dashboard.
 * **Administrator:** Additional admin users who can be created by the Master Administrator. They have admin privileges but cannot perform system-level operations like creating other admin accounts.
 * **Reader:** The public audience. They will experience a fast, responsive, and visually appealing blog designed for optimal readability and user engagement. Their interactions are limited to consuming content and engaging with on-page elements.
 
@@ -54,7 +54,7 @@ This system is a **standalone, self-monetizing blogging platform**. It removes t
 * **Description:** The system shall provide secure authentication for the master administrator with comprehensive security features.
 * **Features:**
     * **Master Admin Account:** A pre-configured master admin account with super_admin privileges created during system setup.
-    * **Default Credentials:** Username: `admin`, Email: `admin@aiblogplatform.com`, Password: `Admin@2024!`.
+    * **Default Credentials:** Username: `admin`, Email: `nihalcy1234@gmail.com`, Password: `Admin@2024!`.
     * **Password Reset via Email OTP:** Secure password reset functionality using 6-digit OTP sent via email.
     * **Account Lockout Protection:** Automatic account locking after 5 failed login attempts for 2 hours.
     * **Password Requirements:** Minimum 8 characters with uppercase, lowercase, number, and special character requirements.

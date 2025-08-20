@@ -3,7 +3,7 @@
 
 const MASTER_ADMIN = {
   username: 'admin',
-  email: 'admin@aiblogplatform.com',
+  email: 'nihalcy1234@gmail.com',
   password: 'Admin@2024!', // This should be changed after first login
   firstName: 'Master',
   lastName: 'Administrator',

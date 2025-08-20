@@ -168,7 +168,7 @@ export default function AdminLoginPage() {
           <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
           <div className="text-xs text-blue-800 space-y-1">
             <p><strong>Username:</strong> admin</p>
-            <p><strong>Email:</strong> admin@aiblogplatform.com</p>
+            <p><strong>Email:</strong> nihalcy1234@gmail.com</p>
             <p><strong>Password:</strong> Admin@2024!</p>
           </div>
         </div>

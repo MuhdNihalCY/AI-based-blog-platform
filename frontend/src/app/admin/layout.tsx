@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
@@ -12,21 +12,35 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, setLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Check if current page is a public admin page (login, register, etc.)
+  const isPublicAdminPage = pathname?.includes('/login') || pathname?.includes('/register') || pathname?.includes('/forgot-password') || pathname?.includes('/reset-password');
+
+  // Initialize auth state
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [loading, isAuthenticated, router]);
+    setLoading(false);
+  }, [setLoading]);
 
   useEffect(() => {
-    if (!loading && user && !['admin', 'super_admin'].includes(user.role)) {
+    if (!loading && !isAuthenticated && !isPublicAdminPage) {
+      router.push('/admin/login');
+    }
+  }, [loading, isAuthenticated, router, isPublicAdminPage]);
+
+  useEffect(() => {
+    if (!loading && user && !['admin', 'super_admin'].includes(user.role) && !isPublicAdminPage) {
       router.push('/');
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, isPublicAdminPage]);
+
+  // For public admin pages, render without authentication checks
+  if (isPublicAdminPage) {
+    return <div className="min-h-screen bg-gray-50">{children}</div>;
+  }
 
   if (loading) {
     return (

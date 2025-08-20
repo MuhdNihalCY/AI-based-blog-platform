@@ -582,4 +582,72 @@ router.post('/reset-password', [
   }
 });
 
+// @route   POST /api/auth/setup-admin
+// @desc    Create master admin user (one-time setup)
+// @access  Public (only if no admin exists)
+router.post('/setup-admin', async (req, res) => {
+  try {
+    // Check if any admin user already exists
+    const existingAdmin = await User.findOne({ 
+      role: { $in: ['admin', 'super_admin'] } 
+    });
+
+    if (existingAdmin) {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin user already exists'
+      });
+    }
+
+    // Create master admin user
+    const adminData = {
+      username: 'admin',
+      email: 'nihalcy1234@gmail.com',
+      password: 'Admin@2024!',
+      role: 'super_admin',
+      profile: {
+        firstName: 'Master',
+        lastName: 'Admin'
+      },
+      isActive: true,
+      emailVerified: true,
+      settings: {
+        notifications: {
+          email: true,
+          browser: true,
+          contentGeneration: true,
+          systemUpdates: true
+        },
+        preferences: {
+          theme: 'light',
+          language: 'en',
+          timezone: 'UTC'
+        }
+      }
+    };
+
+    const user = new User(adminData);
+    await user.save();
+
+    logger.info('Master admin user created successfully');
+
+    res.status(201).json({
+      success: true,
+      message: 'Master admin user created successfully',
+      data: {
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    logger.error('Setup admin error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 module.exports = router;

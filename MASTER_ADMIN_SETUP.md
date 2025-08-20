@@ -4,7 +4,7 @@
 
 ### Default Credentials
 - **Username**: `admin`
-- **Email**: `admin@aiblogplatform.com`
+- **Email**: `nihalcy1234@gmail.com`
 - **Password**: `Admin@2024!`
 - **Role**: `super_admin`
 

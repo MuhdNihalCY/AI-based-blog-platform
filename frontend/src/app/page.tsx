@@ -4,7 +4,7 @@ import {
   FiZap, 
   FiTrendingUp, 
   FiDollarSign, 
-  FiBarChart3, 
+  FiBarChart, 
   FiShield, 
   FiGlobe,
   FiArrowRight,
@@ -33,7 +33,7 @@ const features = [
     description: 'Monetize your blog through affiliate links, ads, and other revenue streams automatically.',
   },
   {
-    icon: FiBarChart3,
+    icon: FiBarChart,
     title: 'Analytics Dashboard',
     description: 'Comprehensive analytics to track performance, revenue, and content engagement.',
   },

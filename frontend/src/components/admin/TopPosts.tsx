@@ -11,6 +11,9 @@ interface Post {
     revenue: number;
   };
   createdAt: string;
+  author?: {
+    username: string;
+  };
 }
 
 interface TopPostsProps {
@@ -55,9 +58,16 @@ export default function TopPosts({ posts }: TopPostsProps) {
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {post.title}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-                    </p>
+                    <div className="flex items-center space-x-2">
+                      {post.author && (
+                        <span className="text-xs text-gray-400">
+                          by {post.author.username}
+                        </span>
+                      )}
+                      <span className="text-sm text-gray-500">
+                        {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
