@@ -51,11 +51,28 @@ export default function ContentGeneration() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Check AI service status
-  const { data: serviceStatus } = useQuery({
+  const { data: serviceStatus, error: serviceError, isLoading: serviceLoading } = useQuery({
     queryKey: ['ai-service-status'],
-    queryFn: () => api.get('/admin/generation-status').then(res => res.data),
+    queryFn: async () => {
+      console.log('🔍 [FRONTEND] Fetching service status...');
+      try {
+        const response = await api.get('/admin/generation-status');
+        console.log('✅ [FRONTEND] Service status response:', response);
+        console.log('📊 [FRONTEND] Service status data:', response.data);
+        return response.data;
+      } catch (error: any) {
+        console.error('❌ [FRONTEND] Service status error:', error);
+        console.error('❌ [FRONTEND] Error response:', error.response);
+        throw error;
+      }
+    },
     refetchInterval: 30000, // Check every 30 seconds
   });
+
+  // Debug logging for service status
+  console.log('🔍 [FRONTEND] Current serviceStatus:', serviceStatus);
+  console.log('🔍 [FRONTEND] Service error:', serviceError);
+  console.log('🔍 [FRONTEND] Service loading:', serviceLoading);
 
   const generateContentMutation = useMutation({
     mutationFn: async (data: GenerationFormData) => {
@@ -131,7 +148,7 @@ export default function ContentGeneration() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!serviceStatus?.aiService?.enabled) {
+    if (!serviceStatus?.data?.aiService?.enabled) {
       toast.error('AI service is not available. Please check your configuration.');
       return;
     }
@@ -206,34 +223,44 @@ export default function ContentGeneration() {
       {/* Service Status */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Service Status</h3>
+        {(() => {
+          console.log('🔍 [FRONTEND] Rendering service status section');
+          console.log('🔍 [FRONTEND] serviceStatus object:', serviceStatus);
+          console.log('🔍 [FRONTEND] serviceStatus.data:', serviceStatus?.data);
+          console.log('🔍 [FRONTEND] aiService:', serviceStatus?.data?.aiService);
+          console.log('🔍 [FRONTEND] imageService:', serviceStatus?.data?.imageService);
+          console.log('🔍 [FRONTEND] aiService.enabled:', serviceStatus?.data?.aiService?.enabled);
+          console.log('🔍 [FRONTEND] imageService.enabled:', serviceStatus?.data?.imageService?.enabled);
+          return null;
+        })()}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3">
-            <div className={`w-3 h-3 rounded-full ${serviceStatus?.aiService?.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
+            <div className={`w-3 h-3 rounded-full ${serviceStatus?.data?.aiService?.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
             <span className="text-sm font-medium text-gray-700">AI Content Generation</span>
             <span className={`text-xs px-2 py-1 rounded-full ${
-              serviceStatus?.aiService?.enabled 
+              serviceStatus?.data?.aiService?.enabled 
                 ? 'bg-green-100 text-green-800' 
                 : 'bg-red-100 text-red-800'
             }`}>
-              {serviceStatus?.aiService?.enabled ? 'Available' : 'Unavailable'}
+              {serviceStatus?.data?.aiService?.enabled ? 'Available' : 'Unavailable'}
             </span>
           </div>
           <div className="flex items-center space-x-3">
-            <div className={`w-3 h-3 rounded-full ${serviceStatus?.imageService?.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
+            <div className={`w-3 h-3 rounded-full ${serviceStatus?.data?.imageService?.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
             <span className="text-sm font-medium text-gray-700">Image Generation</span>
             <span className={`text-xs px-2 py-1 rounded-full ${
-              serviceStatus?.imageService?.enabled 
+              serviceStatus?.data?.imageService?.enabled 
                 ? 'bg-green-100 text-green-800' 
                 : 'bg-red-100 text-red-800'
             }`}>
-              {serviceStatus?.imageService?.enabled ? 'Available' : 'Unavailable'}
+              {serviceStatus?.data?.imageService?.enabled ? 'Available' : 'Unavailable'}
             </span>
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-3 h-3 rounded-full bg-blue-500" />
             <span className="text-sm font-medium text-gray-700">Primary Image Source</span>
             <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-              {serviceStatus?.imageService?.primarySource || 'Stock Images'}
+              {serviceStatus?.data?.imageService?.primarySource || 'Stock Images'}
             </span>
           </div>
         </div>
@@ -370,9 +397,16 @@ export default function ContentGeneration() {
             </div>
 
             {/* Submit Button */}
+            {(() => {
+              const isDisabled = generateContentMutation.isPending || !serviceStatus?.data?.aiService?.enabled;
+              console.log('🔍 [FRONTEND] Button disabled state:', isDisabled);
+              console.log('🔍 [FRONTEND] generateContentMutation.isPending:', generateContentMutation.isPending);
+              console.log('🔍 [FRONTEND] serviceStatus?.data?.aiService?.enabled:', serviceStatus?.data?.aiService?.enabled);
+              return null;
+            })()}
             <button
               type="submit"
-              disabled={generateContentMutation.isPending || !serviceStatus?.aiService?.enabled}
+              disabled={generateContentMutation.isPending || !serviceStatus?.data?.aiService?.enabled}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {generateContentMutation.isPending ? (

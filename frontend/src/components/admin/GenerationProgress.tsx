@@ -65,6 +65,9 @@ export default function GenerationProgress({ onRefresh }: GenerationProgressProp
 
     try {
       const endpoint = status.isRunning ? '/api/admin/scheduler/stop' : '/api/admin/scheduler/start';
+      console.log('🔍 [FRONTEND] Toggling scheduler:', endpoint);
+      console.log('🔍 [FRONTEND] Token:', token ? 'Present' : 'Missing');
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -73,12 +76,20 @@ export default function GenerationProgress({ onRefresh }: GenerationProgressProp
         }
       });
 
+      console.log('🔍 [FRONTEND] Scheduler toggle response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to toggle scheduler');
+        const errorData = await response.text();
+        console.error('🔍 [FRONTEND] Scheduler toggle error response:', errorData);
+        throw new Error(`Failed to toggle scheduler: ${response.status} ${response.statusText}`);
       }
 
+      const responseData = await response.json();
+      console.log('🔍 [FRONTEND] Scheduler toggle success:', responseData);
+      
       await fetchStatus();
     } catch (err) {
+      console.error('🔍 [FRONTEND] Scheduler toggle error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };

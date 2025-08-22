@@ -111,7 +111,78 @@ class AIService {
       targetWordCount
     });
 
-    return this.generateContent(prompt, { ...options, wordCount: targetWordCount });
+    const result = await this.generateContent(prompt, { ...options, wordCount: targetWordCount });
+    
+    // Parse the generated content to extract title and other fields
+    const content = result.content;
+    
+    // Extract title from the first line or H1
+    let title = topic; // fallback to topic
+    let contentBody = content;
+    let excerpt = '';
+    let tags = [];
+    let seo = {};
+    
+    // Ensure title is always a string
+    if (typeof title !== 'string') {
+      title = String(title || 'Untitled Post');
+    }
+    
+    try {
+      // Try to extract title from the first line
+      const lines = content.split('\n').filter(line => line.trim());
+      if (lines.length > 0) {
+        const firstLine = lines[0].trim();
+        // If first line looks like a title (no HTML tags, reasonable length)
+        if (firstLine.length > 10 && firstLine.length < 100 && !firstLine.includes('<')) {
+          title = firstLine.replace(/^#+\s*/, ''); // Remove markdown headers
+          contentBody = lines.slice(1).join('\n'); // Rest is content
+        }
+      }
+      
+      // Generate excerpt from first paragraph
+      const paragraphs = contentBody.split('\n\n').filter(p => p.trim());
+      if (paragraphs.length > 0) {
+        excerpt = paragraphs[0].replace(/<[^>]*>/g, '').substring(0, 200).trim();
+        if (excerpt.length === 200) {
+          excerpt += '...';
+        }
+      }
+      
+      // Generate tags from topic and content
+      tags = this.extractTags(topic, contentBody);
+      
+      // Generate SEO data
+      seo = {
+        title: title,
+        description: excerpt,
+        keywords: tags.slice(0, 5)
+      };
+      
+    } catch (error) {
+      logger.warn('Failed to parse blog post content, using fallback values:', error.message);
+    }
+    
+    // Debug logging
+    console.log('🔍 [AI SERVICE] Generated blog post:');
+    console.log('🔍 [AI SERVICE] Title:', title, 'Type:', typeof title);
+    console.log('🔍 [AI SERVICE] Content length:', contentBody.length);
+    console.log('🔍 [AI SERVICE] Tags:', tags);
+    
+    // Final validation to ensure title is always a string
+    if (typeof title !== 'string') {
+      title = String(title || 'Untitled Post');
+      console.log('🔍 [AI SERVICE] Fixed title to:', title);
+    }
+    
+    return {
+      title,
+      content: contentBody,
+      excerpt,
+      tags,
+      seo,
+      metadata: result.metadata
+    };
   }
 
   async generateSEOOptimizedContent(topic, keywords = [], options = {}) {
@@ -347,6 +418,27 @@ class AIService {
   estimateTokenCount(text) {
     // Rough estimation: 1 token ≈ 4 characters for English text
     return Math.ceil(text.length / 4);
+  }
+
+  extractTags(topic, content) {
+    const tags = [];
+    
+    // Add topic-based tags
+    const topicWords = topic.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+    tags.push(...topicWords.slice(0, 3));
+    
+    // Add common content tags based on keywords
+    const commonTags = ['technology', 'ai', 'artificial-intelligence', 'machine-learning', 'automation', 'business', 'marketing', 'development', 'programming'];
+    
+    const contentLower = content.toLowerCase();
+    commonTags.forEach(tag => {
+      if (contentLower.includes(tag.replace('-', ' ')) && !tags.includes(tag)) {
+        tags.push(tag);
+      }
+    });
+    
+    // Limit to 5 tags
+    return tags.slice(0, 5);
   }
 
   async testConnection() {

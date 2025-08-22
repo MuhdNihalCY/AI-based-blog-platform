@@ -38,6 +38,9 @@ async function handleRequest(
     const path = pathSegments.join('/');
     const url = `${backendUrl}/admin/${path}`;
     
+    console.log('🔍 [API PROXY] Request:', method, path);
+    console.log('🔍 [API PROXY] Backend URL:', url);
+    
     // Get headers from the request
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -46,6 +49,9 @@ async function handleRequest(
     const authHeader = request.headers.get('authorization');
     if (authHeader) {
       headers['Authorization'] = authHeader;
+      console.log('🔍 [API PROXY] Auth header present');
+    } else {
+      console.log('🔍 [API PROXY] No auth header');
     }
     
     // Get body for POST/PUT requests
@@ -53,22 +59,28 @@ async function handleRequest(
     if (method === 'POST' || method === 'PUT') {
       try {
         body = await request.json();
+        console.log('🔍 [API PROXY] Request body:', body);
       } catch {
+        console.log('🔍 [API PROXY] No body or invalid JSON');
         // No body or invalid JSON
       }
     }
     
+    console.log('🔍 [API PROXY] Making request to backend...');
     const response = await fetch(url, {
       method,
       headers,
       ...(body && { body: JSON.stringify(body) }),
     });
 
+    console.log('🔍 [API PROXY] Backend response status:', response.status);
+    
     const data = await response.json();
+    console.log('🔍 [API PROXY] Backend response data:', data);
     
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error('API proxy error:', error);
+    console.error('🔍 [API PROXY] Error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

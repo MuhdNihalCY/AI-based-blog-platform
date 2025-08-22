@@ -868,7 +868,7 @@ router.get('/generation-status', auth, authorize('admin', 'super_admin'), async 
           status: aiService.isEnabled() ? 'available' : 'unavailable'
         },
         imageService: {
-          enabled: imageService.isEnabled ? imageService.isEnabled() : true,
+          enabled: imageService.isEnabled(),
           primarySource: process.env.PREFER_STOCK_IMAGES === 'true' ? 'Stock Images' : 'AI Generation'
         }
       }
@@ -887,14 +887,19 @@ router.get('/generation-status', auth, authorize('admin', 'super_admin'), async 
 // @access  Private (Admin only)
 router.post('/scheduler/start', auth, authorize('admin', 'super_admin'), async (req, res) => {
   try {
+    console.log('🔍 [BACKEND] Starting content scheduler...');
     contentScheduler.start();
+    
+    const status = contentScheduler.getStatus();
+    console.log('🔍 [BACKEND] Scheduler status after start:', status);
     
     res.json({
       success: true,
       message: 'Content scheduler started',
-      data: contentScheduler.getStatus()
+      data: status
     });
   } catch (error) {
+    console.error('🔍 [BACKEND] Scheduler start error:', error);
     logger.error('Scheduler start error:', error);
     res.status(500).json({
       success: false,
@@ -908,14 +913,19 @@ router.post('/scheduler/start', auth, authorize('admin', 'super_admin'), async (
 // @access  Private (Admin only)
 router.post('/scheduler/stop', auth, authorize('admin', 'super_admin'), async (req, res) => {
   try {
+    console.log('🔍 [BACKEND] Stopping content scheduler...');
     contentScheduler.stop();
+    
+    const status = contentScheduler.getStatus();
+    console.log('🔍 [BACKEND] Scheduler status after stop:', status);
     
     res.json({
       success: true,
       message: 'Content scheduler stopped',
-      data: contentScheduler.getStatus()
+      data: status
     });
   } catch (error) {
+    console.error('🔍 [BACKEND] Scheduler stop error:', error);
     logger.error('Scheduler stop error:', error);
     res.status(500).json({
       success: false,

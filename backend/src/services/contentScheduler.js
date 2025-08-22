@@ -114,7 +114,20 @@ class ContentScheduler {
       this.generationLogs.shift();
     }
 
-    logger[level](`ContentScheduler: ${message}`, data);
+    // Use appropriate logger method based on level
+    switch (level) {
+      case 'error':
+        logger.error(`ContentScheduler: ${message}`, data);
+        break;
+      case 'warn':
+        logger.warn(`ContentScheduler: ${message}`, data);
+        break;
+      case 'info':
+        logger.info(`ContentScheduler: ${message}`, data);
+        break;
+      default:
+        logger.info(`ContentScheduler: ${message}`, data);
+    }
   }
 
   /**
@@ -206,8 +219,7 @@ class ContentScheduler {
 
           this.addLog('info', `Generating content for topic: "${topic}" in category: "${category}"`);
 
-          const content = await aiService.generateBlogPost({
-            topic,
+          const content = await aiService.generateBlogPost(topic, {
             category,
             wordCount: Math.floor(Math.random() * 1000) + 800, // 800-1800 words
             style: 'informative',
@@ -217,6 +229,17 @@ class ContentScheduler {
           if (!content) {
             throw new Error('Failed to generate content');
           }
+
+          // Validate content has required fields
+          if (!content.title || typeof content.title !== 'string') {
+            throw new Error('Generated content is missing title');
+          }
+
+          if (!content.content || typeof content.content !== 'string') {
+            throw new Error('Generated content is missing content body');
+          }
+
+          this.addLog('info', `Content generated successfully: "${content.title}"`);
 
           // Generate or fetch image
           let featuredImage = null;
@@ -237,8 +260,18 @@ class ContentScheduler {
             }
           }
 
-          // Create post
-          const slug = slugify(content.title, { lower: true, strict: true });
+          // Create post with safe slug generation
+          let slug;
+          try {
+            slug = slugify(content.title, { lower: true, strict: true });
+            if (!slug || slug.trim() === '') {
+              // Fallback slug if slugify fails
+              slug = `post-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+            }
+          } catch (slugError) {
+            this.addLog('warn', 'Slugify failed, using fallback slug', slugError.message);
+            slug = `post-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+          }
           const uniqueSlug = await this.generateUniqueSlug(slug);
 
           const postData = {

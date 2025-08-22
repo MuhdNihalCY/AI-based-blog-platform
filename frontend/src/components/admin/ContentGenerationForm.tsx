@@ -98,7 +98,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
             </label>
             <select
               {...register('count', { valueAsNumber: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               {[1, 2, 3, 4, 5].map((num) => (
                 <option key={num} value={num}>
@@ -128,7 +128,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
           <textarea
             {...register('topics')}
             rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="e.g., The Future of AI, Machine Learning Applications, Blockchain Technology"
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -161,7 +161,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
           </label>
           <select
             {...register('style')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           >
             {styles.map((style) => (
               <option key={style.value} value={style.value}>
@@ -178,7 +178,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
           <input
             type="text"
             {...register('keywords')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             placeholder="e.g., AI, healthcare, machine learning, automation"
           />
         </div>
@@ -215,7 +215,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
               </label>
               <select
                 {...register('wordCount', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               >
                 <option value={500}>500 words</option>
                 <option value={800}>800 words</option>
@@ -244,7 +244,7 @@ export default function ContentGenerationForm({ onSubmit, isLoading, serviceStat
               </label>
               <select
                 {...register('imageStyle')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               >
                 {imageStyles.map((style) => (
                   <option key={style.value} value={style.value}>

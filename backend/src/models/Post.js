@@ -194,12 +194,22 @@ postSchema.index({ 'analytics.views': -1 });
 // Pre-save middleware to generate slug and calculate metrics
 postSchema.pre('save', function(next) {
   // Generate slug from title if not provided
-  if (!this.slug && this.title) {
-    this.slug = slugify(this.title, {
-      lower: true,
-      strict: true,
-      remove: /[*+~.()'"!:@]/g
-    });
+  if (!this.slug && this.title && typeof this.title === 'string') {
+    try {
+      this.slug = slugify(this.title, {
+        lower: true,
+        strict: true,
+        remove: /[*+~.()'"!:@]/g
+      });
+      
+      // Fallback if slugify returns empty string
+      if (!this.slug || this.slug.trim() === '') {
+        this.slug = `post-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+      }
+    } catch (error) {
+      // Fallback slug if slugify fails
+      this.slug = `post-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    }
   }
 
   // Calculate word count

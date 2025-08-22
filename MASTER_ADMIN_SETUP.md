@@ -1,168 +1,204 @@
-# Master Admin Setup & Authentication Guide
+# Master Admin Setup Guide
 
-## 🔐 Master Admin Account
+This guide provides instructions for setting up the master admin user and configuring the forgot password feature for the AI Blog Platform.
 
-### Default Credentials
-- **Username**: `admin`
-- **Email**: `nihalcy1234@gmail.com`
-- **Password**: `Admin@2024!`
-- **Role**: `super_admin`
+## 🔐 Master Admin Credentials
 
-### Setup Instructions
+The system comes with predefined master admin credentials:
 
-1. **Install Dependencies**
-   ```bash
-   cd backend
-   npm install
-   ```
+- **Username:** `admin`
+- **Email:** `nihalcy1234@gmail.com`
+- **Password:** `Admin@2024!`
+- **Role:** `super_admin`
 
-2. **Configure Environment**
-   ```bash
-   cp env.example .env
-   ```
-   
-   Edit `.env` and configure:
-   - MongoDB connection string
-   - JWT secret key
-   - SMTP settings for email notifications
+## 🚀 Quick Setup
 
-3. **Create Master Admin Account**
-   ```bash
-   npm run setup-admin
-   ```
+### 1. Environment Configuration
 
-4. **Start the Application**
-   ```bash
-   npm run dev
-   ```
+First, ensure your `.env` file in the backend directory contains all necessary configurations:
 
-5. **Login to Admin Dashboard**
-   - Go to: http://localhost:3000/admin/login
-   - Use the default credentials above
-   - **IMPORTANT**: Change the password immediately after first login!
-
-## 🔒 Security Features
-
-### Password Requirements
-- Minimum 8 characters
-- Must contain uppercase letter
-- Must contain lowercase letter
-- Must contain number
-- Must contain special character (@$!%*?&)
-
-### Account Protection
-- **Account Lockout**: 5 failed attempts = 2-hour lock
-- **Login Tracking**: All login attempts are logged
-- **Security Notifications**: Email alerts for suspicious activity
-
-### Password Reset System
-- **Email OTP**: 6-digit code sent via email
-- **10-minute Expiry**: OTP expires after 10 minutes
-- **3 Attempt Limit**: Maximum 3 attempts per OTP
-- **5-minute Cooldown**: Wait 5 minutes between requests
-
-## 📧 Email Configuration
-
-### SMTP Settings (Required for Password Reset)
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
+```bash
+# Copy the example environment file
+cp backend/env.example backend/.env
 ```
 
-### Email Templates Included
-- **Password Reset**: Professional OTP email with security warnings
-- **Welcome Email**: Welcome message for new users
-- **Account Locked**: Security alert for locked accounts
-- **New Login Alert**: Notification for new login attempts
+### 2. Required Environment Variables
 
-## 🛡️ Security Best Practices
+Make sure these variables are set in your `backend/.env` file:
 
-### After First Login
-1. **Change Default Password**: Use a strong, unique password
-2. **Update Email**: Change the default email address
-3. **Enable 2FA**: If available, enable two-factor authentication
-4. **Review Security Settings**: Check account security preferences
+```env
+# AI Content Generation (REQUIRED for content generation)
+GEMINI_API_KEY=your-gemini-api-key-here
 
-### Regular Maintenance
-1. **Monitor Login Activity**: Check for suspicious login attempts
-2. **Update Password Regularly**: Change password every 90 days
-3. **Review Security Logs**: Monitor security event logs
-4. **Keep Email Updated**: Ensure email is current for password resets
+# Email Configuration (REQUIRED for forgot password feature)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=nihalcy1234@gmail.com
+SMTP_PASS=cjex jwqn ovlw wupa
+
+# Database Configuration
+MONGODB_URI=mongodb+srv://mnihalcy:SkmXgwUHRg1cocY2@blogs.sgcaosz.mongodb.net/?retryWrites=true&w=majority&appName=blogs
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRE=7d
+```
+
+### 3. Install Dependencies
+
+```bash
+# Install backend dependencies
+cd backend
+npm install
+
+# Install frontend dependencies
+cd ../frontend
+npm install
+
+# Return to root
+cd ..
+```
+
+### 4. Setup Master Admin
+
+Run the master admin setup script:
+
+```bash
+cd backend
+npm run setup-admin
+```
+
+This will create the master admin user with the predefined credentials.
+
+### 5. Start the Application
+
+```bash
+# Start backend (from backend directory)
+npm run dev
+
+# Start frontend (from frontend directory)
+cd ../frontend
+npm run dev
+```
+
+## 📧 Forgot Password Feature
+
+The platform includes a secure forgot password feature using SMTP OTP:
+
+### How It Works
+
+1. **Request Password Reset:** User enters their email address
+2. **OTP Generation:** System generates a 6-digit OTP
+3. **Email Delivery:** OTP is sent via SMTP email
+4. **Password Reset:** User enters OTP and new password
+5. **Account Update:** Password is updated and OTP is cleared
+
+### Email Templates
+
+The system includes professionally designed email templates:
+- **Password Reset Email:** Contains OTP with security warnings
+- **Welcome Email:** Sent to new users with platform information
+
+### Security Features
+
+- **6-digit OTP:** Secure random number generation
+- **10-minute expiration:** OTP expires after 10 minutes
+- **One-time use:** OTP is cleared after successful password reset
+- **Rate limiting:** Prevents abuse of the forgot password feature
 
 ## 🔧 API Endpoints
 
 ### Authentication Endpoints
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/forgot-password` - Request password reset
-- `POST /api/auth/verify-reset-otp` - Verify OTP
-- `POST /api/auth/reset-password` - Reset password with OTP
-- `GET /api/auth/me` - Get current user profile
-- `PUT /api/auth/profile` - Update user profile
-- `PUT /api/auth/preferences` - Update user preferences
-- `POST /api/auth/logout` - User logout
 
-### Security Headers
-- **CORS**: Configured for security
-- **Helmet**: Security headers enabled
-- **Rate Limiting**: 100 requests per 15 minutes
-- **Input Validation**: All inputs validated and sanitized
+```
+POST /api/auth/login
+POST /api/auth/forgot-password
+POST /api/auth/reset-password
+POST /api/auth/setup-admin
+```
 
-## 🚨 Troubleshooting
+### Forgot Password Flow
+
+1. **Request OTP:**
+   ```bash
+   POST /api/auth/forgot-password
+   {
+     "email": "nihalcy1234@gmail.com"
+   }
+   ```
+
+2. **Reset Password:**
+   ```bash
+   POST /api/auth/reset-password
+   {
+     "email": "nihalcy1234@gmail.com",
+     "otp": "123456",
+     "newPassword": "NewSecurePassword123!"
+   }
+   ```
+
+## 🛡️ Security Best Practices
+
+### After First Login
+
+1. **Change Default Password:** Immediately change the default password
+2. **Update JWT Secret:** Change the JWT_SECRET in your .env file
+3. **Secure API Keys:** Ensure all API keys are properly configured
+4. **Enable HTTPS:** Use HTTPS in production
+
+### Password Requirements
+
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-**Email Not Sending**
-- Check SMTP configuration in `.env`
-- Verify email credentials
-- Check firewall/network settings
+#### 1. AI Content Generation Unavailable
+**Problem:** "AI Content Generation: Unavailable"
+**Solution:** 
+- Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Add it to `GEMINI_API_KEY` in your `.env` file
 
-**OTP Not Working**
-- Check email spam folder
-- Verify email address is correct
-- Wait 5 minutes between requests
+#### 2. Email Service Not Working
+**Problem:** Forgot password emails not sending
+**Solution:**
+- Verify SMTP settings in `.env` file
+- Ensure Gmail app password is correct
+- Check firewall/network restrictions
 
-**Account Locked**
-- Wait 2 hours for automatic unlock
-- Use "Forgot Password" feature
-- Contact support if needed
+#### 3. Database Connection Error
+**Problem:** MongoDB connection fails
+**Solution:**
+- Verify MONGODB_URI in `.env` file
+- Check network connectivity
+- Ensure MongoDB service is running
 
-**Login Issues**
-- Verify username/email is correct
-- Check password requirements
-- Ensure account is active
+### Logs and Debugging
 
-### Support
-- Check application logs in `backend/logs/`
-- Review security event logs
-- Contact support with error details
+Check the logs for detailed error information:
 
-## 📋 Quick Reference
-
-### Master Admin Setup
 ```bash
+# Backend logs
 cd backend
-npm install
-cp env.example .env
-# Edit .env with your settings
-npm run setup-admin
-npm run dev
+tail -f logs/app.log
+
+# Frontend logs (in browser console)
 ```
 
-### Default Login
-- URL: http://localhost:3000/admin/login
-- Username: `admin`
-- Password: `Admin@2024!`
+## 📞 Support
 
-### Password Reset
-1. Click "Forgot Password" on login page
-2. Enter email address
-3. Check email for 6-digit OTP
-4. Enter OTP and new password
-5. Login with new password
+If you encounter any issues:
 
----
+1. Check the logs for error messages
+2. Verify all environment variables are set correctly
+3. Ensure all dependencies are installed
+4. Check the troubleshooting section above
 
-**⚠️ Security Notice**: Always change the default password immediately after first login and keep your credentials secure!
+## 🔄 Updates
+
+This setup guide will be updated as new features are added to the platform. Always refer to the latest version for the most current setup instructions.

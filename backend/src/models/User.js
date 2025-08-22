@@ -66,7 +66,12 @@ const userSchema = new mongoose.Schema({
         default: true
       }
     }
-  }
+  },
+  // Password reset fields
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+  otpCode: String,
+  otpExpires: Date
 }, {
   timestamps: true
 });
@@ -146,6 +151,34 @@ userSchema.methods.resetLoginAttempts = function() {
   return this.updateOne({
     $unset: { loginAttempts: 1, lockUntil: 1 }
   });
+};
+
+// Method to generate OTP
+userSchema.methods.generateOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.otpCode = otp;
+  this.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  return otp;
+};
+
+// Method to verify OTP
+userSchema.methods.verifyOTP = function(otp) {
+  if (!this.otpCode || !this.otpExpires) {
+    return false;
+  }
+  
+  if (this.otpExpires < Date.now()) {
+    return false;
+  }
+  
+  return this.otpCode === otp;
+};
+
+// Method to clear OTP
+userSchema.methods.clearOTP = function() {
+  this.otpCode = undefined;
+  this.otpExpires = undefined;
+  return this.save();
 };
 
 // Static method to find user by credentials

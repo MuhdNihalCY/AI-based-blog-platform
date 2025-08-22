@@ -121,9 +121,21 @@ This system is a **standalone, self-monetizing blogging platform**. It removes t
         * Estimated affiliate revenue (requires manual input or a dedicated integration).
         * Security events and login statistics.
 
+##### FR-6: User Authentication & Security
+* **Description:** The Admin shall have secure access to the system with password recovery capabilities.
+* **Features:**
+    * **Master Admin Setup:** One-time setup script to create the master admin user with predefined credentials.
+    * **Forgot Password:** Email-based OTP system for password reset:
+        * Send 6-digit OTP via SMTP email
+        * 10-minute OTP expiration
+        * Secure password reset flow
+        * Email templates for password reset and welcome emails
+    * **Account Security:** Login attempt tracking and account lockout protection.
+    * **Session Management:** JWT-based authentication with configurable expiration.
+
 #### 3.2 Functional Requirements (Public Blog)
 
-##### FR-6: Blog Viewing & User Experience
+##### FR-7: Blog Viewing & User Experience
 * **Description:** The public blog must be fast, responsive, and provide an excellent reading experience.
 * **Features:**
     * **Optimized Home Page:** Displays a paginated list of recent blog posts with featured images, titles, and SEO-friendly excerpts.
@@ -142,6 +154,15 @@ This system is a **standalone, self-monetizing blogging platform**. It removes t
 
 #### 4.2 Security
 * **Authentication:** The admin dashboard must be secured with a robust login system (e.g., JWT).
+* **Master Admin Credentials:** 
+  - Username: `admin`
+  - Email: `nihalcy1234@gmail.com`
+  - Password: `Admin@2024!`
+  - Role: `super_admin`
+* **Forgot Password Feature:** SMTP-based OTP (One-Time Password) system for password reset
+  - 6-digit OTP sent via email
+  - 10-minute expiration time
+  - Secure password reset flow
 * **Data Security:** All sensitive data, including API keys and user credentials, must be encrypted at rest and in transit.
 * **Access Control:** Only the Administrator shall have access to the dashboard. Public API endpoints should only serve published content.
 

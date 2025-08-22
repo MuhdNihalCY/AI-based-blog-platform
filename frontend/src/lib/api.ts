@@ -12,23 +12,40 @@ export const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
+    console.log('🔍 [API] Making request to:', config.url);
+    console.log('🔍 [API] Request method:', config.method);
+    console.log('🔍 [API] Request headers:', config.headers);
+    
     // Add auth token if available
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth-storage');
+      console.log('🔍 [API] Raw auth-storage:', token);
+      
       if (token) {
         try {
           const authData = JSON.parse(token);
+          console.log('🔍 [API] Parsed auth data:', authData);
+          console.log('🔍 [API] Token from auth data:', authData.state?.token);
+          
           if (authData.state?.token) {
             config.headers.Authorization = `Bearer ${authData.state.token}`;
+            console.log('🔍 [API] Added Authorization header');
+          } else {
+            console.log('🔍 [API] No token found in auth data');
           }
         } catch (error) {
-          // Ignore parsing errors
+          console.error('🔍 [API] Error parsing auth data:', error);
         }
+      } else {
+        console.log('🔍 [API] No auth-storage found in localStorage');
       }
     }
+    
+    console.log('🔍 [API] Final request config:', config);
     return config;
   },
   (error) => {
+    console.error('🔍 [API] Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -36,11 +53,19 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
+    console.log('✅ [API] Response received:', response.status, response.config.url);
+    console.log('✅ [API] Response data:', response.data);
     return response;
   },
   (error) => {
+    console.error('❌ [API] Response error:', error);
+    console.error('❌ [API] Error status:', error.response?.status);
+    console.error('❌ [API] Error data:', error.response?.data);
+    console.error('❌ [API] Error config:', error.config);
+    
     // Handle authentication errors
     if (error.response?.status === 401) {
+      console.log('🔍 [API] 401 Unauthorized - redirecting to login');
       // Clear auth data and redirect to login
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth-storage');

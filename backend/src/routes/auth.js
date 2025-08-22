@@ -1,11 +1,9 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const OTP = require('../models/OTP');
 const { auth } = require('../middleware/auth');
 const logger = require('../utils/logger');
 const emailService = require('../services/emailService');
-const { PASSWORD_REQUIREMENTS, OTP_CONFIG } = require('../config/admin');
 
 const router = express.Router();
 
@@ -23,9 +21,9 @@ router.post('/register', [
     .normalizeEmail()
     .withMessage('Please provide a valid email'),
   body('password')
-    .isLength({ min: PASSWORD_REQUIREMENTS.minLength })
-    .withMessage(`Password must be at least ${PASSWORD_REQUIREMENTS.minLength} characters long`)
-    .matches(PASSWORD_REQUIREMENTS.pattern)
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
   body('firstName')
     .optional()
@@ -395,70 +393,43 @@ router.post('/forgot-password', [
 
     const { email } = req.body;
 
-    // Check if user exists
+    // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
       // Don't reveal if email exists or not for security
       return res.json({
         success: true,
-        message: 'If an account with this email exists, a password reset code has been sent.'
+        message: 'If an account with this email exists, a password reset OTP has been sent.'
       });
     }
 
-    // Check if user is active
     if (!user.isActive) {
       return res.status(400).json({
         success: false,
-        message: 'Account is deactivated. Please contact support.'
+        message: 'Account is deactivated'
       });
     }
 
-    // Check for existing unused OTPs
-    const existingOTP = await OTP.findOne({
-      email: email.toLowerCase(),
-      type: 'password_reset',
-      isUsed: false,
-      expiresAt: { $gt: new Date() }
-    });
-
-    if (existingOTP) {
-      const timeDiff = Math.ceil((existingOTP.expiresAt - new Date()) / (1000 * 60));
-      if (timeDiff > OTP_CONFIG.cooldownMinutes) {
-        return res.status(429).json({
-          success: false,
-          message: `Please wait ${OTP_CONFIG.cooldownMinutes} minutes before requesting another code.`
-        });
-      }
-    }
-
-    // Create new OTP
-    const otpRecord = await OTP.createOTP(
-      email.toLowerCase(),
-      'password_reset',
-      OTP_CONFIG.expiryMinutes
-    );
+    // Generate OTP
+    const otp = user.generateOTP();
+    await user.save();
 
     // Send email
     try {
-      await emailService.sendPasswordResetOTP(
-        email,
-        otpRecord.otp,
-        user.profile.firstName || user.username
-      );
-
+      await emailService.sendPasswordResetEmail(email, otp, user.username);
+      
       logger.info(`Password reset OTP sent to: ${email}`);
-
+      
       res.json({
         success: true,
-        message: 'Password reset code has been sent to your email.'
+        message: 'If an account with this email exists, a password reset OTP has been sent.'
       });
-
     } catch (emailError) {
-      // Delete the OTP if email fails
-      await otpRecord.remove();
+      // Clear OTP if email fails
+      await user.clearOTP();
       
-      logger.error('Failed to send password reset email:', emailError);
+      logger.error(`Failed to send password reset email to ${email}:`, emailError);
       
       res.status(500).json({
         success: false,
@@ -475,48 +446,8 @@ router.post('/forgot-password', [
   }
 });
 
-// @route   POST /api/auth/verify-reset-otp
-// @desc    Verify password reset OTP
-// @access  Public
-router.post('/verify-reset-otp', [
-  body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Please provide a valid email'),
-  body('otp')
-    .isLength({ min: 6, max: 6 })
-    .withMessage('OTP must be 6 digits')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array()
-      });
-    }
-
-    const { email, otp } = req.body;
-
-    // Verify OTP
-    const otpRecord = await OTP.verifyOTP(email.toLowerCase(), otp, 'password_reset');
-
-    res.json({
-      success: true,
-      message: 'OTP verified successfully. You can now reset your password.'
-    });
-
-  } catch (error) {
-    logger.error('OTP verification error:', error);
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
-
 // @route   POST /api/auth/reset-password
-// @desc    Reset password using verified OTP
+// @desc    Reset password using OTP
 // @access  Public
 router.post('/reset-password', [
   body('email')
@@ -527,9 +458,9 @@ router.post('/reset-password', [
     .isLength({ min: 6, max: 6 })
     .withMessage('OTP must be 6 digits'),
   body('newPassword')
-    .isLength({ min: PASSWORD_REQUIREMENTS.minLength })
-    .withMessage(`Password must be at least ${PASSWORD_REQUIREMENTS.minLength} characters long`)
-    .matches(PASSWORD_REQUIREMENTS.pattern)
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
 ], async (req, res) => {
   try {
@@ -543,28 +474,35 @@ router.post('/reset-password', [
 
     const { email, otp, newPassword } = req.body;
 
-    // Verify OTP
-    const otpRecord = await OTP.verifyOTP(email.toLowerCase(), otp, 'password_reset');
-
-    // Find user
+    // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
-        message: 'User not found'
+        message: 'Invalid email or OTP'
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account is deactivated'
+      });
+    }
+
+    // Verify OTP
+    if (!user.verifyOTP(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired OTP'
       });
     }
 
     // Update password
     user.password = newPassword;
+    await user.clearOTP(); // Clear OTP after successful reset
     await user.save();
-
-    // Mark OTP as used
-    await otpRecord.markAsUsed();
-
-    // Invalidate all other OTPs for this email
-    await OTP.invalidateAllOTPs(email.toLowerCase(), 'password_reset');
 
     logger.info(`Password reset successful for: ${email}`);
 
@@ -575,9 +513,9 @@ router.post('/reset-password', [
 
   } catch (error) {
     logger.error('Password reset error:', error);
-    res.status(400).json({
+    res.status(500).json({
       success: false,
-      message: error.message
+      message: 'Server error'
     });
   }
 });

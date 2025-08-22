@@ -1,80 +1,78 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const { MASTER_ADMIN } = require('../config/admin');
 const logger = require('../utils/logger');
 require('dotenv').config();
+
+// Master Admin Credentials
+const MASTER_ADMIN = {
+  username: 'admin',
+  email: 'nihalcy1234@gmail.com',
+  password: 'Admin@2024!',
+  role: 'super_admin',
+  profile: {
+    firstName: 'Master',
+    lastName: 'Admin'
+  },
+  isActive: true,
+  preferences: {
+    theme: 'light',
+    notifications: {
+      email: true,
+      dashboard: true
+    }
+  }
+};
 
 async function setupMasterAdmin() {
   try {
     // Connect to MongoDB
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ai-blog-platform';
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
+    await mongoose.connect(process.env.MONGODB_URI);
     logger.info('Connected to MongoDB');
 
-    // Check if master admin already exists
-    const existingAdmin = await User.findOne({
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ 
       $or: [
         { email: MASTER_ADMIN.email },
-        { username: MASTER_ADMIN.username }
+        { username: MASTER_ADMIN.username },
+        { role: { $in: ['admin', 'super_admin'] } }
       ]
     });
 
     if (existingAdmin) {
-      logger.info('Master admin account already exists');
-      console.log('\n✅ Master admin account already exists');
-      console.log(`   Username: ${existingAdmin.username}`);
+      logger.warn('Admin user already exists');
+      console.log('❌ Admin user already exists');
       console.log(`   Email: ${existingAdmin.email}`);
+      console.log(`   Username: ${existingAdmin.username}`);
       console.log(`   Role: ${existingAdmin.role}`);
-      return;
+      process.exit(0);
     }
 
-    // Create master admin account
-    const masterAdmin = new User({
-      username: MASTER_ADMIN.username,
-      email: MASTER_ADMIN.email,
-      password: MASTER_ADMIN.password,
-      role: MASTER_ADMIN.role,
-      isActive: MASTER_ADMIN.isActive,
-      profile: {
-        firstName: MASTER_ADMIN.firstName,
-        lastName: MASTER_ADMIN.lastName
-      }
-    });
+    // Create master admin user
+    const adminUser = new User(MASTER_ADMIN);
+    await adminUser.save();
 
-    await masterAdmin.save();
-
-    logger.info('Master admin account created successfully');
-    
-    console.log('\n🎉 Master admin account created successfully!');
-    console.log('\n📋 Login Credentials:');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    logger.info('Master admin user created successfully');
+    console.log('✅ Master admin user created successfully!');
+    console.log('');
+    console.log('📋 Admin Credentials:');
     console.log(`   Username: ${MASTER_ADMIN.username}`);
     console.log(`   Email: ${MASTER_ADMIN.email}`);
     console.log(`   Password: ${MASTER_ADMIN.password}`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('\n⚠️  IMPORTANT SECURITY NOTICE:');
-    console.log('   • Change the default password immediately after first login');
-    console.log('   • Store these credentials securely');
-    console.log('   • Delete this script after successful setup');
-    console.log('\n🚀 You can now login to the admin dashboard!');
+    console.log(`   Role: ${MASTER_ADMIN.role}`);
+    console.log('');
+    console.log('🔐 Please change the password after first login for security!');
+    console.log('');
+    console.log('📧 Forgot password feature is available with SMTP OTP method');
+    console.log('   Make sure to configure SMTP settings in your .env file');
+
+    process.exit(0);
 
   } catch (error) {
     logger.error('Failed to setup master admin:', error);
-    console.error('\n❌ Failed to setup master admin account:', error.message);
+    console.error('❌ Failed to setup master admin:', error.message);
     process.exit(1);
-  } finally {
-    await mongoose.disconnect();
-    logger.info('Disconnected from MongoDB');
   }
 }
 
-// Run the setup if this script is executed directly
-if (require.main === module) {
-  setupMasterAdmin();
-}
-
-module.exports = setupMasterAdmin;
+// Run the setup
+setupMasterAdmin();

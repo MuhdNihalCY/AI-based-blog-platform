@@ -194,7 +194,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <input
                               type="text"
                               {...register('title', { required: 'Title is required' })}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="Enter post title"
                             />
                             {errors.title && (
@@ -209,7 +209,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <textarea
                               {...register('excerpt')}
                               rows={3}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="Brief description of the post"
                             />
                           </div>
@@ -221,7 +221,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <textarea
                               {...register('content', { required: 'Content is required' })}
                               rows={12}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="Write your post content here..."
                             />
                             {errors.content && (
@@ -241,7 +241,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <input
                               type="text"
                               {...register('seo.metaTitle')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="SEO title for search engines"
                             />
                           </div>
@@ -253,7 +253,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <textarea
                               {...register('seo.metaDescription')}
                               rows={3}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="Brief description for search engines"
                             />
                           </div>
@@ -265,7 +265,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <input
                               type="text"
                               {...register('seo.keywords')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="keyword1, keyword2, keyword3"
                             />
                           </div>
@@ -281,7 +281,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             </label>
                             <select
                               {...register('status')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             >
                               <option value="draft">Draft</option>
                               <option value="published">Published</option>
@@ -296,7 +296,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <input
                               type="text"
                               {...register('categories')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="Technology, AI, Programming"
                             />
                           </div>
@@ -308,7 +308,7 @@ export default function PostModal({ post, isOpen, onClose, onSave }: PostModalPr
                             <input
                               type="text"
                               {...register('tags')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="mt-1 block text-gray-900 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               placeholder="ai, automation, blog"
                             />
                           </div>
