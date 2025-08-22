@@ -101,6 +101,14 @@ export const apiClient = {
     users: () => api.get('/admin/users'),
     logs: (params?: { level?: string; limit?: number }) =>
       api.get('/admin/logs', { params }),
+    posts: {
+      getAll: () => api.get('/admin/posts'),
+      getById: (id: string) => api.get(`/admin/posts/${id}`),
+      update: (id: string, data: any) => api.put(`/admin/posts/${id}`, data),
+      publish: (id: string) => api.post(`/admin/posts/${id}/publish`),
+      unpublish: (id: string) => api.post(`/admin/posts/${id}/unpublish`),
+      delete: (id: string) => api.delete(`/admin/posts/${id}`),
+    },
   },
 
   // Automation endpoints
@@ -111,6 +119,23 @@ export const apiClient = {
     generateImage: (data: any) => api.post('/automation/generate-image', data),
     status: () => api.get('/automation/status'),
     stats: () => api.get('/automation/stats'),
+  },
+
+  // Content endpoints
+  content: {
+    getAll: (params?: {
+      page?: number;
+      limit?: number;
+      status?: string;
+      category?: string;
+      search?: string;
+    }) => api.get('/content', { params }),
+    getById: (id: string) => api.get(`/content/${id}`),
+    create: (data: any) => api.post('/content', data),
+    update: (id: string, data: any) => api.put(`/content/${id}`, data),
+    delete: (id: string) => api.delete(`/content/${id}`),
+    publish: (id: string) => api.post(`/content/${id}/publish`),
+    unpublish: (id: string) => api.post(`/content/${id}/unpublish`),
   },
 
   // Blog endpoints

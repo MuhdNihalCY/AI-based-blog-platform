@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../utils/logger');
+require('dotenv').config();
 
 class AIService {
   constructor() {
@@ -16,12 +17,34 @@ class AIService {
         return;
       }
 
+      // Log API key for debugging (first few characters only)
+      const apiKeyPreview = apiKey.substring(0, 10) + '...';
+      logger.info(`Initializing AI service with API key: ${apiKeyPreview}`);
+
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       
-      logger.info('AI service initialized successfully');
+      // Try different model names
+      const modelNames = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash'];
+      let modelInitialized = false;
+      
+      for (const modelName of modelNames) {
+        try {
+          this.model = this.genAI.getGenerativeModel({ model: modelName });
+          logger.info(`AI service initialized successfully with model: ${modelName}`);
+          modelInitialized = true;
+          break;
+        } catch (modelError) {
+          logger.warn(`Failed to initialize model ${modelName}: ${modelError.message}`);
+        }
+      }
+      
+      if (!modelInitialized) {
+        logger.error('Failed to initialize any Gemini model');
+        this.model = null;
+      }
     } catch (error) {
       logger.error('Failed to initialize AI service:', error);
+      this.model = null;
     }
   }
 
@@ -447,18 +470,22 @@ class AIService {
         return { success: false, error: 'AI service not initialized' };
       }
 
-      const result = await this.model.generateContent('Hello, this is a test.');
+      // Test with a simple prompt
+      const result = await this.model.generateContent('Hello, this is a test. Please respond with "AI service is working correctly."');
       const response = await result.response;
       
       return { 
         success: true, 
         message: 'AI service is working correctly',
-        testResponse: response.text()
+        testResponse: response.text(),
+        model: this.model.modelName || 'unknown'
       };
     } catch (error) {
+      logger.error('AI service test failed:', error);
       return { 
         success: false, 
-        error: error.message 
+        error: error.message,
+        details: error.stack
       };
     }
   }
@@ -478,6 +505,14 @@ class AIService {
    */
   isEnabled() {
     return this.model !== null && this.genAI !== null;
+  }
+
+  /**
+   * Reinitialize the AI service (useful after environment variables are loaded)
+   */
+  reinitialize() {
+    logger.info('Reinitializing AI service...');
+    this.initializeAI();
   }
 }
 

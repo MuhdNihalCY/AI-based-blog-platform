@@ -64,26 +64,26 @@ const benefits = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="relative z-10">
+      <header className="border-b border-gray-200">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold gradient-text">
+              <h1 className="text-2xl font-bold text-gray-900">
                 AI Blog Platform
               </h1>
             </div>
             <div className="flex items-center space-x-4">
               <Link 
                 href="/admin/login" 
-                className="btn-outline"
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
                 Admin Login
               </Link>
               <Link 
                 href="/blog" 
-                className="btn-primary"
+                className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
               >
                 View Blog
               </Link>
@@ -93,29 +93,29 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
             Generate{' '}
-            <span className="gradient-text">Passive Income</span>
+            <span className="text-blue-600">Passive Income</span>
             <br />
             with AI-Powered Blogging
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
             Create a fully automated, self-monetizing blog platform that generates content, 
             images, and revenue while you sleep. Powered by cutting-edge AI technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/admin/register" 
-              className="btn-primary text-lg px-8 py-4"
+              className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-lg font-medium inline-flex items-center"
             >
               Get Started Free
               <FiArrowRight className="ml-2" />
             </Link>
             <Link 
               href="/blog" 
-              className="btn-outline text-lg px-8 py-4"
+              className="border border-gray-300 text-gray-700 px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-lg font-medium"
             >
               View Demo Blog
             </Link>
@@ -124,13 +124,13 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
               Everything You Need to Succeed
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Our platform provides all the tools and features you need to create a 
               successful, automated blog that generates passive income.
             </p>
@@ -140,15 +140,15 @@ export default function HomePage() {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="card p-6 hover:shadow-medium transition-shadow duration-300"
+                className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                  <feature.icon className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -158,22 +158,22 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Why Choose Our Platform?
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                 Our AI-powered platform is designed to maximize your success with 
                 automated content generation, SEO optimization, and monetization tools.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center">
-                    <FiCheck className="w-5 h-5 text-success-500 mr-3 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                    <FiCheck className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700">{benefit}</span>
                   </div>
                 ))}
               </div>

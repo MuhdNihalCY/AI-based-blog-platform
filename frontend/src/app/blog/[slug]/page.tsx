@@ -10,12 +10,14 @@ import {
   UserIcon, 
   CalendarIcon,
   ArrowLeftIcon,
-  ShareIcon
+  ShareIcon,
+  BookmarkIcon
 } from '@heroicons/react/24/outline';
 import { api } from '@/lib/api';
 import BlogPostCard from '@/components/blog/BlogPostCard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { formatDate } from '@/lib/utils';
+import { processMarkdown } from '@/lib/markdown';
 
 interface Post {
   _id: string;
@@ -122,15 +124,15 @@ export default function BlogPostPage() {
     : post.author.username;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/blog"
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-500 mb-4"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm"
           >
-            <ArrowLeftIcon className="h-4 w-4 mr-1" />
+            <ArrowLeftIcon className="h-4 w-4 mr-2" />
             Back to Blog
           </Link>
         </div>
@@ -138,14 +140,14 @@ export default function BlogPostPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Article Header */}
-        <header className="mb-8">
+        <header className="mb-12">
           {/* Categories */}
           {post.categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-6">
               {post.categories.map((category) => (
                 <span
                   key={category}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700"
                 >
                   {category}
                 </span>
@@ -154,15 +156,17 @@ export default function BlogPostPage() {
           )}
 
           {/* Title */}
-          <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl font-bold text-gray-900 mb-8 leading-tight">
             {post.title}
           </h1>
 
           {/* Meta Information */}
-          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-6">
-            <div className="flex items-center space-x-1">
-              <UserIcon className="h-4 w-4" />
-              <span>{authorName}</span>
+          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                <UserIcon className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="font-medium">{authorName}</span>
             </div>
             <div className="flex items-center space-x-1">
               <CalendarIcon className="h-4 w-4" />
@@ -180,7 +184,7 @@ export default function BlogPostPage() {
 
           {/* Featured Image */}
           {post.featuredImage && (
-            <div className="relative h-96 rounded-lg overflow-hidden mb-8">
+            <div className="relative h-96 rounded-xl overflow-hidden mb-8">
               <Image
                 src={post.featuredImage.url}
                 alt={post.featuredImage.alt}
@@ -192,8 +196,8 @@ export default function BlogPostPage() {
 
           {/* Excerpt */}
           {post.excerpt && (
-            <div className="bg-gray-50 rounded-lg p-6 mb-8">
-              <p className="text-lg text-gray-700 italic leading-relaxed">
+            <div className="bg-gray-50 rounded-xl p-8 mb-8">
+              <p className="text-xl text-gray-700 leading-relaxed font-medium">
                 {post.excerpt}
               </p>
             </div>
@@ -201,10 +205,10 @@ export default function BlogPostPage() {
         </header>
 
         {/* Article Content */}
-        <article className="prose prose-lg max-w-none mb-12">
+        <article className="mb-12">
           <div 
-            className="text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: processMarkdown(post.content) }}
           />
         </article>
 

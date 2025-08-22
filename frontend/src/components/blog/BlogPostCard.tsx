@@ -41,99 +41,63 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
     : post.author.username;
 
   return (
-    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <article className="group cursor-pointer">
       {/* Featured Image */}
       {post.featuredImage && (
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-64 overflow-hidden rounded-xl mb-6">
           <Image
             src={post.featuredImage.url}
             alt={post.featuredImage.alt}
             fill
-            className="object-cover hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       )}
 
-      <div className="p-6">
+      <div className="space-y-4">
         {/* Categories */}
         {post.categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2">
             {post.categories.slice(0, 2).map((category) => (
               <span
                 key={category}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
               >
                 {category}
               </span>
             ))}
-            {post.categories.length > 2 && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                +{post.categories.length - 2} more
-              </span>
-            )}
           </div>
         )}
 
         {/* Title */}
         <Link href={`/blog/${post.slug}`}>
-          <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-indigo-600 transition-colors duration-200 line-clamp-2">
+          <h2 className="text-2xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200 leading-tight line-clamp-2">
             {post.title}
           </h2>
         </Link>
 
         {/* Excerpt */}
-        <p className="text-gray-600 mb-4 line-clamp-3">
+        <p className="text-gray-600 line-clamp-3 text-lg leading-relaxed">
           {post.excerpt}
         </p>
 
         {/* Meta Information */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <UserIcon className="h-4 w-4" />
-              <span>{authorName}</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                <UserIcon className="h-3 w-3 text-gray-600" />
+              </div>
+              <span className="font-medium">{authorName}</span>
             </div>
             <div className="flex items-center space-x-1">
               <ClockIcon className="h-4 w-4" />
               <span>{post.readingTime} min read</span>
             </div>
           </div>
-          <div className="flex items-center space-x-1">
-            <EyeIcon className="h-4 w-4" />
-            <span>{post.analytics.views.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
-            {post.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700"
-              >
-                #{tag}
-              </span>
-            ))}
-            {post.tags.length > 3 && (
-              <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                +{post.tags.length - 3}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Date and Read More */}
-        <div className="flex items-center justify-between">
           <time className="text-sm text-gray-500">
             {formatDate(post.publishDate)}
           </time>
-          <Link
-            href={`/blog/${post.slug}`}
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
-          >
-            Read more →
-          </Link>
         </div>
       </div>
     </article>

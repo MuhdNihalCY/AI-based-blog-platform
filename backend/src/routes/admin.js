@@ -599,6 +599,176 @@ router.get('/posts', auth, authorize('admin', 'super_admin'), async (req, res) =
   }
 });
 
+// @route   PUT /api/admin/posts/:id
+// @desc    Update a post
+// @access  Private (Admin only)
+router.put('/posts/:id', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    // Update fields
+    const updateFields = ['title', 'content', 'excerpt', 'status', 'categories', 'tags', 'seo', 'featuredImage'];
+    
+    updateFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        post[field] = req.body[field];
+      }
+    });
+
+    // Handle scheduled date
+    if (req.body.scheduledDate) {
+      post.scheduledDate = new Date(req.body.scheduledDate);
+      if (post.status === 'scheduled') {
+        post.publishDate = post.scheduledDate;
+      }
+    }
+
+    // Set publish date if status is being changed to published
+    if (req.body.status === 'published' && post.status !== 'published') {
+      post.publishDate = new Date();
+    }
+
+    await post.save();
+
+    logger.info(`Post updated: ${post.title} by ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Post updated successfully',
+      data: { post }
+    });
+
+  } catch (error) {
+    logger.error('Update post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /api/admin/posts/:id/publish
+// @desc    Publish a draft post
+// @access  Private (Admin only)
+router.post('/posts/:id/publish', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    if (post.status === 'published') {
+      return res.status(400).json({
+        success: false,
+        message: 'Post is already published'
+      });
+    }
+
+    post.status = 'published';
+    post.publishDate = new Date();
+    await post.save();
+
+    logger.info(`Post published: ${post.title} by ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Post published successfully',
+      data: { post }
+    });
+
+  } catch (error) {
+    logger.error('Publish post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /api/admin/posts/:id/unpublish
+// @desc    Unpublish a published post
+// @access  Private (Admin only)
+router.post('/posts/:id/unpublish', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    if (post.status !== 'published') {
+      return res.status(400).json({
+        success: false,
+        message: 'Post is not published'
+      });
+    }
+
+    post.status = 'draft';
+    await post.save();
+
+    logger.info(`Post unpublished: ${post.title} by ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Post unpublished successfully',
+      data: { post }
+    });
+
+  } catch (error) {
+    logger.error('Unpublish post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   DELETE /api/admin/posts/:id
+// @desc    Delete a post
+// @access  Private (Admin only)
+router.delete('/posts/:id', auth, authorize('admin', 'super_admin'), async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    await post.deleteOne();
+
+    logger.info(`Post deleted: ${post.title} by ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Post deleted successfully'
+    });
+
+  } catch (error) {
+    logger.error('Delete post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 // @route   GET /api/admin/media
 // @desc    Get all media files for admin
 // @access  Private (Admin only)
